@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Google Maps Moving Marker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3YgK3vQEL9nKtwK81CxV-H_vptg
+UEHbE"></script>
+<style>
+        #map {
+align-content: center;
+   height: 400px;
+            width: 95%;
+        }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+ 
+/TAXI OR BASE LOCATION TO MODIFIED AS PER REQUIREMENTS/
+ 
+let taxisA ={lat: [ Search for Routes:each item's start_point's latitude], lng: [Search for Routes:each item's start_point's longitude]};
+ 
+let taxisB ={lat: [Search for Routes:each item's end_point's latitude], lng: [Search for Routes:each item's end_point's longitude]};
+ 
+console.log('taxisA', taxisA);
+console.log('taxisB', taxisB);
+ 
+/*RUTAS DISPONIBLES DESDE LA BASE DE DATOS,  EJEMPLO ABAJO USA RUTA DE TERMINAL 1 GDL, PARA USAR OTRA, BORRA LOS SIGNOS DE COMENTARIOS PARA USAR  Y ENMARCA LA ACTUAL CON SIGNOS DE COMENTARIOS */
+ 
+/*RUTA GDL TERMINAL1
+let taxiA = {lat: taxisA.lat[1], lng: taxisA.lng[1]};
+let taxiB = {lat: taxisB.lat[1], lng: taxisB.lng[1]};*/
+ 
+/*
+RUTA GDL CIRCUNVALACION*/
+let taxiA = {lat: taxisA.lat[0], lng: taxisA.lng[0]};
+let taxiB = {lat: taxisB.lat[0], lng: taxisB.lng[0]};
+ 
+/*RUTAS  JOEL 
+C-RING
+let taxiA = {lat: taxisA.lat[3], lng: taxisA.lng[3]};
+let taxiB = {lat: taxisB.lat[3], lng: taxisB.lng[3]};*/
+ 
+/*QR
+let taxiA = {lat: taxisA.lat[4], lng: taxisA.lng[4]};
+let taxiB = {lat: taxisB.lat[4], lng: taxisB.lng[4]};*/
+ 
+/*LUSAIL
+let taxiA = {lat: taxisA.lat[2], lng: taxisA.lng[2]};
+let taxiB = {lat: taxisB.lat[2], lng: taxisB.lng[2]};*/
+console.log('taxiA', taxiA);
+console.log('taxiB', taxiB);
+ 
+       let map;
+        let marker;
+        let routePolyline;
+ 
+/* // INIT MAPS */
+    initMap();
+ 
+    function initMap() {
+/BUBBLE GEOLOCATION/
+ 
+let startLat = Current geographic position's latitude;
+ 
+let startLng =Current geographic position's longitude ;
+ 
+let newUserPosition, startLocation;
+ 
+startLocation = {lat: startLat, lng: startLng}; 
+console.log('bubblesLoc', startLocation);
+           // Display Map/
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: startLocation,
+                zoom: 4
+            });
+            // Marker current user/
+            marker = new google.maps.Marker({
+                position: startLocation,
+                map: map,
+                title: 'Pasajero',
+                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            });
+            /* Initialize the directions service and renderer */
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                polylineOptions: {
+                    strokeColor: 'blue',
+                    strokeOpacity: 0.6,
+                    strokeWeight: 6
+                }
+            });
+            directionsRenderer.setMap(map);
+            calculateAndDisplayRoute(directionsService, directionsRenderer, taxiA,
+                taxiB)
+                .then(routePolyline => {
+                    if (routePolyline) {
+                        console.log('routePolyline yes'); 
+// WATCH THE USER'S POSITION AND UPDATE THE MARKER
+                      newUserPosition = {lat: Current geographic position's latitude, lng: Current geographic position's longitude};
+console.log(newUserPosition);
+                                marker.setPosition(newUserPosition);
+                                map.setCenter(newUserPosition);
+                }})
+    .catch(error => {
+        console.error('Failed to get routePolyline:', error);
+    });}
+        /* GET ROUTE */
+        function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+            const request =
+            {
+                origin: taxiA,
+                destination: taxiB,
+                travelMode: google.maps.TravelMode.WALKING
+            }
+            /* */
+            return new Promise((resolve, reject) => {
+                directionsService.route(request, function (response, status) {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        console.log('response ok');
+                        const route = response.routes[0].overview_path;
+                        const routePolyline = new google.maps.Polyline({
+                            path: route,
+                        });
+                        globalPolyline = routePolyline;
+                        directionsRenderer.setDirections(response);
+                        resolve(globalPolyline);
+                    } else {
+                        console.log('response not ok');
+                        reject(status);
+                    }
+                })
+            }
+            );
+        }
+</script>
+</body>
+</html>
