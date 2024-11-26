@@ -1,0 +1,15 @@
+{
+  "name": "unittests",
+  "version": "1.0.0",
+  "main": "mapFunctions.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
